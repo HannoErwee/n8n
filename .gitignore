@@ -1,0 +1,11 @@
+# n8n local data (Docker volume — not committed)
+.n8n/
+n8n_data/
+
+# Environment variables
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
