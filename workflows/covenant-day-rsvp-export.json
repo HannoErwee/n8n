@@ -1,0 +1,76 @@
+{
+  "name": "Covenant Day — RSVP Export",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "rsvps",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "d8e9f0a1-b2c3-4567-def5-890012345678",
+      "name": "Export Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "covenant-day-rsvp-export"
+    },
+    {
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "const fs = require('fs');\nconst path = '/home/node/.n8n/rsvps.json';\n\n// Check API key\nconst query = $input.first().json.query || {};\nconst expectedKey = process.env.RSVP_EXPORT_KEY || 'covenant-day-export-2026';\n\nif (query.key !== expectedKey) {\n  return [{ json: { error: 'Unauthorized', status: 401 } }];\n}\n\n// Read RSVPs\nlet rsvps = [];\ntry {\n  const content = fs.readFileSync(path, 'utf8');\n  rsvps = JSON.parse(content);\n} catch (e) {\n  rsvps = [];\n}\n\n// Filter by coupleSlug if provided\nconst slug = query.slug;\nif (slug) {\n  rsvps = rsvps.filter(r => r.coupleSlug === slug);\n}\n\nconst attending = rsvps.filter(r => r.attending === 'yes');\nconst declining = rsvps.filter(r => r.attending === 'no');\nconst totalGuests = attending.reduce((sum, r) => sum + (parseInt(r.guests) || 1), 0);\n\nreturn [{ json: {\n  rsvps,\n  summary: {\n    total: rsvps.length,\n    attending: attending.length,\n    declining: declining.length,\n    totalGuests\n  }\n}}];"
+      },
+      "id": "e9f0a1b2-c3d4-5678-ef06-901234567890",
+      "name": "Read RSVPs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": 200,
+          "responseData": "firstEntryJson"
+        }
+      },
+      "id": "f0a1b2c3-d4e5-6789-f0a1-012345678901",
+      "name": "Respond with RSVPs",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [720, 300]
+    }
+  ],
+  "connections": {
+    "Export Webhook": {
+      "main": [
+        [
+          {
+            "node": "Read RSVPs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read RSVPs": {
+      "main": [
+        [
+          {
+            "node": "Respond with RSVPs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    {
+      "name": "covenant-day"
+    }
+  ]
+}

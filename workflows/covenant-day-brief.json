@@ -1,0 +1,86 @@
+{
+  "name": "Covenant Day — Wedding Brief Submission",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "covenant-day-brief",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "c1d2e3f4-a5b6-7890-cdef-123456789001",
+      "name": "Brief Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "covenant-day-brief"
+    },
+    {
+      "parameters": {
+        "fromEmail": "erweehanno@gmail.com",
+        "toEmail": "erweehanno@gmail.com",
+        "subject": "=New Wedding Brief: {{ $json.body.partner1 }} & {{ $json.body.partner2 }}",
+        "emailFormat": "html",
+        "html": "=<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\" />\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n  <title>New Wedding Brief — Covenant Day</title>\n</head>\n<body style=\"margin:0;padding:0;background-color:#0d0c0b;font-family:'Georgia',serif;\">\n  <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background-color:#0d0c0b;padding:40px 20px;\">\n    <tr>\n      <td align=\"center\">\n        <table width=\"600\" cellpadding=\"0\" cellspacing=\"0\" style=\"background-color:#111110;border:1px solid rgba(255,255,255,0.08);border-radius:4px;overflow:hidden;max-width:600px;width:100%;\">\n\n          <!-- Header -->\n          <tr>\n            <td style=\"background-color:#0d0c0b;padding:40px 48px 32px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.06);\">\n              <img src=\"https://covenant-day.fly.dev/logo.png\" alt=\"Covenant Day\" width=\"160\" style=\"display:block;margin:0 auto 20px;opacity:0.95;\" />\n              <p style=\"margin:0;color:rgba(212,175,100,0.9);font-size:10px;letter-spacing:0.3em;text-transform:uppercase;font-family:Arial,sans-serif;\">New Wedding Brief</p>\n            </td>\n          </tr>\n\n          <!-- Body -->\n          <tr>\n            <td style=\"padding:40px 48px;\">\n              <h1 style=\"margin:0 0 8px;color:#ffffff;font-size:26px;font-weight:normal;letter-spacing:0.02em;\">{{ $json.body.partner1 }} &amp; {{ $json.body.partner2 }}</h1>\n              <p style=\"margin:0 0 32px;color:rgba(212,175,100,0.7);font-size:12px;letter-spacing:0.15em;text-transform:uppercase;font-family:Arial,sans-serif;\">submitted their wedding brief</p>\n\n              <!-- Details -->\n              <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\">\n                <tr>\n                  <td style=\"padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.06);\">\n                    <p style=\"margin:0 0 4px;color:rgba(255,255,255,0.4);font-size:10px;letter-spacing:0.2em;text-transform:uppercase;font-family:Arial,sans-serif;\">Wedding Date</p>\n                    <p style=\"margin:0;color:#ffffff;font-size:15px;font-family:Arial,sans-serif;\">{{ $json.body.wedding_date || '—' }}</p>\n                  </td>\n                </tr>\n                <tr>\n                  <td style=\"padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.06);\">\n                    <p style=\"margin:0 0 4px;color:rgba(255,255,255,0.4);font-size:10px;letter-spacing:0.2em;text-transform:uppercase;font-family:Arial,sans-serif;\">Venue</p>\n                    <p style=\"margin:0;color:#ffffff;font-size:15px;font-family:Arial,sans-serif;\">{{ $json.body.venue || '—' }}</p>\n                  </td>\n                </tr>\n                <tr>\n                  <td style=\"padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.06);\">\n                    <p style=\"margin:0 0 4px;color:rgba(255,255,255,0.4);font-size:10px;letter-spacing:0.2em;text-transform:uppercase;font-family:Arial,sans-serif;\">Theme</p>\n                    <p style=\"margin:0;color:#ffffff;font-size:15px;font-family:Arial,sans-serif;\">{{ $json.body.theme || '—' }}</p>\n                  </td>\n                </tr>\n                <tr>\n                  <td style=\"padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.06);\">\n                    <p style=\"margin:0 0 4px;color:rgba(255,255,255,0.4);font-size:10px;letter-spacing:0.2em;text-transform:uppercase;font-family:Arial,sans-serif;\">Contact Email</p>\n                    <p style=\"margin:0;color:#d4af64;font-size:15px;font-family:Arial,sans-serif;\"><a href=\"mailto:{{ $json.body.rsvp_email }}\" style=\"color:#d4af64;text-decoration:none;\">{{ $json.body.rsvp_email || '—' }}</a></p>\n                  </td>\n                </tr>\n                <tr>\n                  <td style=\"padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.06);\">\n                    <p style=\"margin:0 0 4px;color:rgba(255,255,255,0.4);font-size:10px;letter-spacing:0.2em;text-transform:uppercase;font-family:Arial,sans-serif;\">Sections Selected</p>\n                    <p style=\"margin:0;color:#ffffff;font-size:14px;font-family:Arial,sans-serif;\">{{ $json.body.sections || '—' }}</p>\n                  </td>\n                </tr>\n                <tr>\n                  <td style=\"padding:20px 0 0;\">\n                    <p style=\"margin:0 0 10px;color:rgba(255,255,255,0.4);font-size:10px;letter-spacing:0.2em;text-transform:uppercase;font-family:Arial,sans-serif;\">Config JSON</p>\n                    <pre style=\"margin:0;color:rgba(255,255,255,0.7);font-size:12px;line-height:1.6;white-space:pre-wrap;background:#0d0c0b;padding:16px;border-radius:3px;font-family:monospace;\">{{ JSON.stringify($json.body.config, null, 2) }}</pre>\n                  </td>\n                </tr>\n              </table>\n            </td>\n          </tr>\n\n          <!-- Footer -->\n          <tr>\n            <td style=\"background-color:#0d0c0b;padding:24px 48px;border-top:1px solid rgba(255,255,255,0.06);text-align:center;\">\n              <p style=\"margin:0;color:rgba(255,255,255,0.25);font-size:11px;letter-spacing:0.05em;font-family:Arial,sans-serif;\">Covenant Day &nbsp;&middot;&nbsp; covenantday.co.za</p>\n            </td>\n          </tr>\n\n        </table>\n      </td>\n    </tr>\n  </table>\n</body>\n</html>",
+        "options": {}
+      },
+      "id": "d2e3f4a5-b6c7-8901-defa-234567890012",
+      "name": "Send Brief Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [480, 300],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-credentials",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": 200,
+          "responseData": "firstEntryJson"
+        }
+      },
+      "id": "e3f4a5b6-c7d8-9012-efab-345678900123",
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [720, 300]
+    }
+  ],
+  "connections": {
+    "Brief Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send Brief Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Brief Email": {
+      "main": [
+        [
+          {
+            "node": "Respond OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    {
+      "name": "covenant-day"
+    }
+  ]
+}

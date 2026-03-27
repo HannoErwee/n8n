@@ -1,0 +1,33 @@
+app = 'covenant-day-n8n'
+primary_region = 'jnb'
+
+[build]
+
+[env]
+  N8N_HOST = '0.0.0.0'
+  N8N_PORT = '5678'
+  N8N_PROTOCOL = 'https'
+  WEBHOOK_URL = 'https://covenant-day-n8n.fly.dev/'
+  N8N_EDITOR_BASE_URL = 'https://covenant-day-n8n.fly.dev/'
+  GENERIC_TIMEZONE = 'Africa/Johannesburg'
+  TZ = 'Africa/Johannesburg'
+  N8N_SECURE_COOKIE = 'true'
+  EXECUTIONS_DATA_MAX_AGE = '168'
+  N8N_LOG_LEVEL = 'info'
+
+[http_service]
+  internal_port = 5678
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+[[vm]]
+  memory = '512mb'
+  cpu_kind = 'shared'
+  cpus = 1
+
+[[mounts]]
+  source = 'n8n_data'
+  destination = '/home/node/.n8n'

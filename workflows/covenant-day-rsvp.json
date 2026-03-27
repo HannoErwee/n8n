@@ -1,0 +1,108 @@
+{
+  "name": "Covenant Day — RSVP Storage",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rsvp",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "f4a5b6c7-d8e9-0123-fab1-456789001234",
+      "name": "RSVP Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "covenant-day-rsvp"
+    },
+    {
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "const fs = require('fs');\nconst path = '/home/node/.n8n/rsvps.json';\nconst body = $input.first().json.body;\n\n// Read existing RSVPs\nlet rsvps = [];\ntry {\n  const content = fs.readFileSync(path, 'utf8');\n  rsvps = JSON.parse(content);\n} catch (e) {\n  rsvps = [];\n}\n\n// Build new RSVP entry\nconst newRsvp = {\n  id: Date.now().toString(),\n  coupleSlug: body.coupleSlug || 'unknown',\n  name: body.name || '',\n  attending: body.attending || 'yes',\n  guests: parseInt(body.guests) || 1,\n  message: body.message || '',\n  email: body.email || '',\n  submittedAt: new Date().toISOString()\n};\n\nrsvps.push(newRsvp);\n\n// Write back to volume\nfs.writeFileSync(path, JSON.stringify(rsvps, null, 2));\n\nreturn [{ json: { success: true, rsvp: newRsvp } }];"
+      },
+      "id": "a5b6c7d8-e9f0-1234-abc2-567890012345",
+      "name": "Store RSVP",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "erweehanno@gmail.com",
+        "toEmail": "erweehanno@gmail.com",
+        "subject": "=New RSVP: {{ $json.rsvp.name }} ({{ $json.rsvp.coupleSlug }})",
+        "emailFormat": "html",
+        "html": "=<!DOCTYPE html>\n<html lang=\"en\">\n<head><meta charset=\"UTF-8\" /><title>New RSVP — Covenant Day</title></head>\n<body style=\"margin:0;padding:0;background-color:#0d0c0b;font-family:Arial,sans-serif;\">\n  <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background-color:#0d0c0b;padding:40px 20px;\">\n    <tr>\n      <td align=\"center\">\n        <table width=\"600\" cellpadding=\"0\" cellspacing=\"0\" style=\"background-color:#111110;border:1px solid rgba(255,255,255,0.08);border-radius:4px;max-width:600px;width:100%;\">\n          <tr>\n            <td style=\"background-color:#0d0c0b;padding:32px 48px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.06);\">\n              <p style=\"margin:0;color:rgba(212,175,100,0.9);font-size:10px;letter-spacing:0.3em;text-transform:uppercase;\">New RSVP</p>\n            </td>\n          </tr>\n          <tr>\n            <td style=\"padding:32px 48px;\">\n              <h2 style=\"margin:0 0 4px;color:#fff;font-size:22px;font-weight:normal;\">{{ $json.rsvp.name }}</h2>\n              <p style=\"margin:0 0 24px;color:rgba(212,175,100,0.7);font-size:11px;letter-spacing:0.15em;text-transform:uppercase;\">{{ $json.rsvp.coupleSlug }}</p>\n              <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\">\n                <tr><td style=\"padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);\"><p style=\"margin:0 0 3px;color:rgba(255,255,255,0.4);font-size:10px;letter-spacing:0.2em;text-transform:uppercase;\">Attending</p><p style=\"margin:0;color:#fff;font-size:14px;\">{{ $json.rsvp.attending === 'yes' ? '✓ Yes' : '✗ No' }}</p></td></tr>\n                <tr><td style=\"padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);\"><p style=\"margin:0 0 3px;color:rgba(255,255,255,0.4);font-size:10px;letter-spacing:0.2em;text-transform:uppercase;\">Guests</p><p style=\"margin:0;color:#fff;font-size:14px;\">{{ $json.rsvp.guests }}</p></td></tr>\n                {{ $json.rsvp.email ? '<tr><td style=\"padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);\"><p style=\"margin:0 0 3px;color:rgba(255,255,255,0.4);font-size:10px;letter-spacing:0.2em;text-transform:uppercase;\">Email</p><p style=\"margin:0;color:#d4af64;font-size:14px;\">' + $json.rsvp.email + '</p></td></tr>' : '' }}\n                {{ $json.rsvp.message ? '<tr><td style=\"padding:10px 0;\"><p style=\"margin:0 0 3px;color:rgba(255,255,255,0.4);font-size:10px;letter-spacing:0.2em;text-transform:uppercase;\">Message</p><p style=\"margin:0;color:rgba(255,255,255,0.8);font-size:14px;\">' + $json.rsvp.message + '</p></td></tr>' : '' }}\n              </table>\n            </td>\n          </tr>\n          <tr><td style=\"background-color:#0d0c0b;padding:20px 48px;border-top:1px solid rgba(255,255,255,0.06);text-align:center;\"><p style=\"margin:0;color:rgba(255,255,255,0.25);font-size:11px;\">Covenant Day &middot; covenantday.co.za</p></td></tr>\n        </table>\n      </td>\n    </tr>\n  </table>\n</body></html>",
+        "options": {}
+      },
+      "id": "b6c7d8e9-f0a1-2345-bcd3-678900123456",
+      "name": "Notify Hanno",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [720, 300],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-credentials",
+          "name": "SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": 200,
+          "responseData": "firstEntryJson"
+        }
+      },
+      "id": "c7d8e9f0-a1b2-3456-cde4-789001234567",
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [960, 300]
+    }
+  ],
+  "connections": {
+    "RSVP Webhook": {
+      "main": [
+        [
+          {
+            "node": "Store RSVP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store RSVP": {
+      "main": [
+        [
+          {
+            "node": "Notify Hanno",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Hanno": {
+      "main": [
+        [
+          {
+            "node": "Respond OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    {
+      "name": "covenant-day"
+    }
+  ]
+}
